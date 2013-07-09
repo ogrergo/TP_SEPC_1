@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 2.4)
 project(Allocphy)
+enable_testing()
+add_definitions(-Wall -Werror)
 
 #########
 # Gestion des variantes
 #########
 # Vous devez editer la ligne suivante pour y mettre vos logins
 #########
-set(VARIANTE_LOGINS login1 login2 login3)
+set(VARIANTE_LOGINS login1 login2 login)
 
 ###
 
@@ -19,7 +21,7 @@ execute_process(COMMAND echo ${VARIANTE_SHA} COMMAND tr "a-f" "A-F" COMMAND xarg
 
 configure_file (
   src/variante.h.in
-  src/variante.h
+  ${CMAKE_SOURCE_DIR}/src/variante.h
 )
 
 #########
@@ -30,8 +32,6 @@ configure_file (
 # Compilation standard avec googletest
 #######
 
-enable_testing()
-add_definitions(-Wall -Werror)
 
 ###
 # sur Debian et al, les googletests sont à recompiler
