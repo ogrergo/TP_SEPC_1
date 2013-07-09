@@ -20,7 +20,7 @@ TEST( Variantes, cff ) {
   multi=1;
 #endif
 
-  ASSERT_GT(multi, 1);
+  ASSERT_EQ(multi, 1);
 
   ASSERT_EQ( mem_init(), 0 );
 
