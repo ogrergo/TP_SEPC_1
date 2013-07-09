@@ -58,8 +58,8 @@ TEST_F(BaseMemTest, allocall) {
   ASSERT_EQ(mem_free(m1, ALLOC_MEM_SIZE), 0 );
   void * m3 = mem_alloc(ALLOC_MEM_SIZE);
   ASSERT_EQ( m1, m3);
-  memset(m1, 2, ALLOC_MEM_SIZE);
-  ASSERT_EQ( mem_free(m2, ALLOC_MEM_SIZE), 0 );
+  memset(m3, 2, ALLOC_MEM_SIZE);
+  ASSERT_EQ( mem_free(m3, ALLOC_MEM_SIZE), 0 );
 }
 
 TEST_F(BaseMemTest, boundaries) { 
@@ -136,6 +136,10 @@ TEST_F(BaseMemTest, petitetaille) {
 #ifdef BF
   multi=2;
 #endif
+#ifdef WBUDDY
+  multi=3;
+#endif
+
 
   ASSERT_GT(multi, 0);
 
