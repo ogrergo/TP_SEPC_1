@@ -23,12 +23,19 @@
 // Weigthed buddy default values
 #define WBUDDY
 #define WBUDDY_MAX_INDEX 40
-#define ALLOC_MEM_SIZE ((unsigned int) 1<< (WBUDDY_MAX_INDEX/2))
+#define ALLOC_MEM_SIZE ((unsigned int) 1<<(WBUDDY_MAX_INDEX/2))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int mem_init();
 void *mem_alloc(unsigned long size);
 int mem_free(void *ptr, unsigned long size);
 int mem_destroy();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

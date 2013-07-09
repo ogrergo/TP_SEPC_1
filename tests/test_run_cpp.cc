@@ -73,29 +73,26 @@ void doLiberer ::operator() (allocat &t)
     }
 }
 
-extern "C" {
+void random_run_cpp(int nb=100, bool verbose=false)
+{
+  be_verbose = verbose;
   
-  void random_run_cpp(int nb=100, bool verbose=false)
-  {
-    be_verbose = verbose;
+  
+  vector<allocat> liste_allocation;
     
+  /* choisir les allocations */
+  fillList_fibo<ALLOC_MEM_SIZE> ( liste_allocation );
     
-    vector<allocat> liste_allocation;
+  /* afficher l'etat de la memoire */
     
-    /* choisir les allocations */
-    fillList_fibo<ALLOC_MEM_SIZE> ( liste_allocation );
-    
-    /* afficher l'etat de la memoire */
-    
-    /* faire les allocations */
-    for_each (liste_allocation.begin(), liste_allocation.end(), doAlloc());
-    
-    /* melanger la liste */
-    random_shuffle (liste_allocation.begin (), liste_allocation.end ());
-    
-    /* faire les deallocations */
-    for_each ( liste_allocation.begin (), liste_allocation.end (), doLiberer ());
-    
-  }
+  /* faire les allocations */
+  for_each (liste_allocation.begin(), liste_allocation.end(), doAlloc());
+  
+  /* melanger la liste */
+  random_shuffle (liste_allocation.begin (), liste_allocation.end ());
+  
+  /* faire les deallocations */
+  for_each ( liste_allocation.begin (), liste_allocation.end (), doLiberer ());
   
 }
+

@@ -27,31 +27,32 @@ TEST( Variantes, cff ) {
   for(i=0; i < 8; i++)
     {
       tab[i] = mem_alloc(S8);
-      ASSERT_NE( tab[i], 0 );
+      ASSERT_NE( tab[i], (void *)0 );
       memset(tab[i], 3, S8);
     }
 
   for(i=1; i < 8; i+= 2)
     ASSERT_EQ( mem_free( tab[i], S8 ), 0 );
 
-  ASSERT_EQ( mem_alloc(3*S8), 0 );
+  ASSERT_EQ( mem_alloc(3*S8), (void *)0 );
   ASSERT_EQ( mem_free( tab[2], S8 ), 0 );
   tab[2] = mem_alloc(3*S8);
-  ASSERT_NE( tab[2], 0 );
+  ASSERT_NE( tab[2], (void *)0 );
   memset(tab[2], 3, 3*S8);
 
   ASSERT_EQ( mem_free( tab[6], S8 ), 0 );
   tab[6] = mem_alloc(3*S8);
-  ASSERT_NE( tab[6], 0 );
+  ASSERT_NE( tab[6], (void *)0 );
   memset(tab[6], 3, 3*S8);
 
   ASSERT_EQ( mem_free( tab[2], 3*S8 ), 0 );
   ASSERT_EQ( mem_free( tab[6], 3*S8 ), 0 );
-  ASSERT_EQ( tab[2] = mem_alloc(7*S8) );
+  tab[2] = mem_alloc(7*S8);
+  ASSERT_EQ( tab[2], (void *)0 );
 
   ASSERT_EQ( mem_free( tab[4], S8 ), 0 );
   tab[4] = mem_alloc(7*S8);
-  ASSERT_NE( tab[4], 0);
+  ASSERT_NE( tab[4], (void *)0);
   memset(tab[4], 3, 7*S8);
 
   ASSERT_EQ( mem_free( tab[4], 7*S8 ), 0 );

@@ -12,9 +12,10 @@ using namespace std;
 
 extern "C" {
 #include "../src/mem.h"
+}
 
 #include "test_run_cpp.h"
-}
+
 
 
 class allocat 
