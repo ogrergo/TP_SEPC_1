@@ -18,13 +18,13 @@
 #define CFF_MAX_INDEX 20
 #define ALLOC_MEM_SIZE ((unsigned int) 1<< CFF_MAX_INDEX)
 
-#elseif SUJET == 1
+#elif SUJET == 1
 // Buddy default value
 #define BUDDY
 #define BUDDY_MAX_INDEX 20
 #define ALLOC_MEM_SIZE ((unsigned int) 1<< BUDDY_MAX_INDEX)
 
-#elseif SUJET == 2
+#elif SUJET == 2
 
 // Weigthed buddy default values
 #define WBUDDY
