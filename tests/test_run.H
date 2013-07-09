@@ -11,7 +11,7 @@
 using namespace std;
 
 extern "C" {
-#include "mem.h"
+#include "../src/mem.h"
 
 #include "test_run_cpp.h"
 }

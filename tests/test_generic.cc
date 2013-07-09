@@ -139,66 +139,41 @@ TEST_F(BaseMemTest, petitetaille) {
 
   ASSERT_GT(multi, 0);
 
-  
-
-void test_small()
-{
-  void *m1, *m2, *m3;
-  int multi = 0;
-  
-#ifdef BUDDY
-  multi=1;
-#endif
-#ifdef CFF
-  multi=2;
-#endif
-#ifdef BF
-  multi=2;
-#endif
-
-  CU_ASSERT(multi > 0);
-
-  CU_ASSERT_EQUAL_FATAL( mem_init(), 0 );
-  CU_ASSERT_PTR_NOT_NULL_FATAL( m1 = mem_alloc(1) );
+  void *m1 = mem_alloc(1);
+  ASSERT_NE( m1, 0 );
   memset( m1, 0, 1);
-
-  CU_ASSERT_PTR_NOT_NULL_FATAL( m2 = mem_alloc(1) );
-  memset( m2, 0, 1);
+  
+  void *m2 = mem_alloc(1);
+  ASSERT_NE( m2, 0 );
+  memset( m2, 0, 1 );
 
   if (m2 > m1)
-    { CU_ASSERT_FATAL( (m2-m1) >= multi*sizeof(void*) ); }
+    { ASSERT_GE( (m2-m1),  multi*sizeof(void*) ); }
   else
-    { CU_ASSERT_FATAL( (m1-m2) >= multi*sizeof(void*) ); }
+    { ASSERT_GE( (m1-m2), multi*sizeof(void*) ); }
 
-  CU_ASSERT_EQUAL_FATAL( mem_free( m1, 1 ), 0 );
-  CU_ASSERT_EQUAL_FATAL( mem_free( m2, 1 ), 0 );
+  ASSERT_EQ( mem_free( m1, 1 ), 0 );
+  ASSERT_EQ( mem_free( m2, 1 ), 0 );
   
 
-  CU_ASSERT_PTR_NOT_NULL_FATAL( m3 = mem_alloc(ALLOC_MEM_SIZE) );
+  void * m3 = mem_alloc(ALLOC_MEM_SIZE);
+  ASSERT_NE( m3, 0 ); 
   memset(m3, 4, ALLOC_MEM_SIZE);
-  CU_ASSERT_EQUAL_FATAL( mem_free( m3, ALLOC_MEM_SIZE ), 0 );
-
-  CU_ASSERT_EQUAL_FATAL( mem_destroy(), 0);  
+  ASSERT_EQ( mem_free( m3, ALLOC_MEM_SIZE ), 0 );
 }
 
-void test_random()
-{
-  int i;
-  void *mref;
-
-  CU_ASSERT_EQUAL_FATAL( mem_init(), 0 );
-  CU_ASSERT_PTR_NOT_NULL_FATAL( mref = mem_alloc(ALLOC_MEM_SIZE) );
+TEST_F(BaseMemTest, aleatoire) {
+  void *mref = mem_alloc(ALLOC_MEM_SIZE);
+  ASSERT_NE( mref, 0 );
   memset(mref, 4, ALLOC_MEM_SIZE);
-  CU_ASSERT_EQUAL_FATAL( mem_free( mref, ALLOC_MEM_SIZE ), 0 );
-
+  ASSERT_EQ( mem_free( mref, ALLOC_MEM_SIZE ), 0 );
+  
   for(i=0; i< 10; i++)
     {
-      void *m1;
       random_run_cpp(100, false);
-      CU_ASSERT_PTR_NOT_NULL_FATAL( m1 = mem_alloc(ALLOC_MEM_SIZE) );
+      void *m1 = mem_alloc(ALLOC_MEM_SIZE);
+      ASSERT_NE( m1, 0 );
       memset(m1, 4, ALLOC_MEM_SIZE);
-      CU_ASSERT_EQUAL_FATAL( mem_free( m1, ALLOC_MEM_SIZE ), 0 );
-    }
-
-  CU_ASSERT_EQUAL_FATAL( mem_destroy(), 0);  
+      ASSERT_EQ( mem_free( m1, ALLOC_MEM_SIZE ), 0 );
+    } 
 }
