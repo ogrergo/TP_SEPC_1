@@ -17,7 +17,7 @@ string(SHA512 VARIANTE_SHA "${VARIANTE_LOGINS}")
 if (${VARIANTE_SHA} STREQUAL "740444f437149a43d9f494c09ceec14f974517a6886da494619e4ed1c6530518b36f4b36615346ee845743ab072be382b3d4308b8a864b3bdd17406c69fc9a43" )
   message(FATAL_ERROR "** ERREUR **: Vous devez modifier CMakeLists.txt pour y mettre vos logins")
 endif()
-execute_process(COMMAND echo ${VARIANTE_SHA} COMMAND tr "a-f" "A-F" COMMAND xargs printf "16 i 10 o %s 3 %% p" COMMAND tee sauv.txt COMMAND dc OUTPUT_VARIABLE VARIANTE_SUJET)
+execute_process(COMMAND echo ${VARIANTE_SHA} COMMAND tr "a-f" "A-F" COMMAND xargs printf "16 i 10 o %s 3 %% p" COMMAND dc OUTPUT_VARIABLE VARIANTE_SUJET)
 
 configure_file (
   src/variante.h.in
