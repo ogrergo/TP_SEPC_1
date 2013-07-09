@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "src/mem.h"
+#include "../src/mem.h"
 
 TEST( Variantes, bf ) {
   int multi = 0;
