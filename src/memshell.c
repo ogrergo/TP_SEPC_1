@@ -1,18 +1,24 @@
+/*****************************************************
+ * Copyright Grégory Mounié 2013                     *
+ *           Simon Nieuviarts 2008-2012              *
+ * This code is distributed under the GLPv3 licence. *
+ * Ce code est distribué sous la licence GPLv3+.     *
+ *****************************************************/
 
- #include <stdio.h>
- #include <string.h>
- #include <stdlib.h>
- 
- #include "mem.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "mem.h"
 
 /*
-===============================================================================
-Macros
-===============================================================================
+  ===============================================================================
+  Macros
+  ===============================================================================
 */
 
 /*
-#define DEBUG
+  #define DEBUG
 */
 
 /*
@@ -24,7 +30,7 @@ Macros
  * Nombre de commandes differentes pour l'interpreteur
  * (sans inclure les commandes erronees (ERROR))
  */
-#define NB_CMD 7
+#define NB_CMD 8
  
 /*
  * Nombre de caracteres maximal pour une ligne de commande
@@ -37,16 +43,16 @@ Macros
 #define PROMPT ">"
 
 /*
-===============================================================================
-Types
-===============================================================================
+  ===============================================================================
+  Types
+  ===============================================================================
 */
 
 /*
  * Identification de la commande tapee
  * On rajoute ERROR pour les commandes erronees
  */
-typedef enum {INIT=0, SHOW, USED, ALLOC, FREE, HELP, EXIT, ERROR} COMMAND;
+typedef enum {INIT=0, SHOW, USED, ALLOC, FREE, DESTROY, HELP, EXIT, ERROR} COMMAND;
 
 /*
  * type des identificateurs de blocs
@@ -76,9 +82,9 @@ typedef struct {
 } BLOCINFO;
 
 /*
-===============================================================================
-Variables globales
-===============================================================================
+  ===============================================================================
+  Variables globales
+  ===============================================================================
 */
 
 
@@ -91,7 +97,7 @@ unsigned long id_count;
 /*
  * Liste des commandes reconnues
  */
-static char* commands[NB_CMD] = {"init", "show", "used","alloc", "free", "help", "exit"};
+static char* commands[NB_CMD] = {"init", "show", "used","alloc", "free", "destroy", "help", "exit"};
 	
 	
 /*
@@ -101,26 +107,17 @@ static char* commands[NB_CMD] = {"init", "show", "used","alloc", "free", "help",
  */
 BLOCINFO bloc_info_table[NB_MAX_ALLOC];
 
-extern void *zone_memoire;
+static void *zone_memoire;
 #ifndef HEAP_SIZE
 #define HEAP_SIZE ALLOC_MEM_SIZE
 #endif
-void mem_show(void (*print)(void *zone, size_t size)) {};
 
 /*
-===============================================================================
-Fonctions
-===============================================================================
+  ===============================================================================
+  Fonctions
+  ===============================================================================
 */
 
-
-/*
- * Fonction de formattage de l'affichage de la mémoire libre
- */
-void mem_print(void *zone, size_t size)
-{
-	printf("0x%lX 0x%lX\n", (unsigned long)(zone - (void*)zone_memoire), (unsigned long)size);
-}
 
 /*
  * Fonction d'affichage de la mémoire occupée
@@ -132,9 +129,9 @@ void used()
 	for(i=0; i<NB_MAX_ALLOC; i++) {
 		if ((bloc_info_table[i]).id != 0) {
 			printf("%ld 0x%lX 0x%lX\n",
-				bloc_info_table[i].id,
-				(unsigned long)(bloc_info_table[i].address - (void*)zone_memoire),
-				(unsigned long)bloc_info_table[i].size);
+			       bloc_info_table[i].id,
+			       (unsigned long)(bloc_info_table[i].address - (void*)zone_memoire),
+			       (unsigned long)bloc_info_table[i].size);
 		}
 	}
 	
@@ -152,8 +149,8 @@ void help()
 	printf("\tLa taille peut être en décimal ou en héxadécimal (préfixe 0x)\n");
 	printf("\tretour : identificateur de bloc et adresse de départ de la zone\n");
 	printf("3) free <identificateur> : libération d'un bloc\n");
-	printf("4) show : affichage la liste des blocs libres restants\n");	
-	printf("\tsous la forme {adresse de départ, taille}\n");
+	printf("4) destroy : libération de l'allocateur\n");
+	printf("4) show : affichage la taille initiale et de l'adresse de départ\n");	
 	printf("5) used : affichage de la liste des blocs occupés\n");
 	printf("\tsous la forme {identificateur, adresse de départ, taille}\n");		
 	printf("6) help : affichage de ce manuel\n");
@@ -225,63 +222,63 @@ ARG get_args(char *args, COMMAND *pcmd)
 	/* en fonction de la commande desiree */
 	switch(*pcmd) {
 		
-		case ALLOC:
-			if (args == NULL) {
-				/* erreur si aucun argument */
-				*pcmd = ERROR;
-				break;
-			}
-			/* recuperation du parametre <taille> */
-			size_string = strtok(args, "\n");
+	case ALLOC:
+		if (args == NULL) {
+			/* erreur si aucun argument */
+			*pcmd = ERROR;
+			break;
+		}
+		/* recuperation du parametre <taille> */
+		size_string = strtok(args, "\n");
 		
-			size = strtol(size_string, &endptr, 0);
-			/* NB : dernier parametre a 0 pour gerer decimal et hexa*/
+		size = strtol(size_string, &endptr, 0);
+		/* NB : dernier parametre a 0 pour gerer decimal et hexa*/
 
-			if ((*endptr != '\0') || (size == 0) || (size < 0)) {
-				/* erreur si l'argument n'est pas entier 
-				   ou s'il est nul, ou s'il est negatif */
-				*pcmd = ERROR;
-				break;
-			}
-			/* sinon l'argument est correct */
-			/* on remplit la structure avec la valeur obtenue*/
-			our_args.size = (size_t)size;				
+		if ((*endptr != '\0') || (size == 0) || (size < 0)) {
+			/* erreur si l'argument n'est pas entier 
+			   ou s'il est nul, ou s'il est negatif */
+			*pcmd = ERROR;
 			break;
+		}
+		/* sinon l'argument est correct */
+		/* on remplit la structure avec la valeur obtenue*/
+		our_args.size = (size_t)size;				
+		break;
 				
-		case FREE:
-			id_string = strtok(args, "\n");
-			if (id_string == NULL) {
-				/* erreur si aucun argument */
-				*pcmd = ERROR;
-				break;
-			}
-			id = strtol(id_string, &endptr, 10);
+	case FREE:
+		id_string = strtok(args, "\n");
+		if (id_string == NULL) {
+			/* erreur si aucun argument */
+			*pcmd = ERROR;
+			break;
+		}
+		id = strtol(id_string, &endptr, 10);
 
-			if ((*endptr != '\0') || (id == 0) || (id < 0)) {
-				/* erreur si l'argument n'est pas entier
-				   ou s'il est nul ou negatif */
-				*pcmd = ERROR;
-				break;
-			}
-			/* sinon l'argument est correct */
-			/* on remplit la structure avec la valeur obtenue*/
-			our_args.id = (ID)id;						
+		if ((*endptr != '\0') || (id == 0) || (id < 0)) {
+			/* erreur si l'argument n'est pas entier
+			   ou s'il est nul ou negatif */
+			*pcmd = ERROR;
 			break;
+		}
+		/* sinon l'argument est correct */
+		/* on remplit la structure avec la valeur obtenue*/
+		our_args.id = (ID)id;						
+		break;
 				
-		default:;
+	default:;
 	}
 	return our_args;
 }
 
  
- /*
-  * Analyse une ligne tapee
-  * args : emplacement ou stocker la structure des arguments
-  * retour : la commande tapee
-  */
+/*
+ * Analyse une ligne tapee
+ * args : emplacement ou stocker la structure des arguments
+ * retour : la commande tapee
+ */
 COMMAND read_command(ARG *args)
 {
-  //	char c;
+	//	char c;
 	char cmd[MAX_CMD_SIZE]="";
 	char *token;
 	COMMAND our_cmd;
@@ -330,15 +327,15 @@ ID get_id(void *addr, size_t size)
 			
 		return id_count++; /* NB: on postincremente id_count */
 	}	
- }
+}
 
 
- /*
-  * Obtient la taille et l'adresse d'un bloc a partir d'un id
-  * addr : emplacement ou stocker l'adresse du bloc
-  * size : emplacement ou stocker la taille du bloc 
-  * retour : 0 si ok, -1 si id incorrect
-  */
+/*
+ * Obtient la taille et l'adresse d'un bloc a partir d'un id
+ * addr : emplacement ou stocker l'adresse du bloc
+ * size : emplacement ou stocker la taille du bloc 
+ * retour : 0 si ok, -1 si id incorrect
+ */
 int get_info_from_id(ID id, void** addr, size_t* size)
 {
  
@@ -392,84 +389,87 @@ int main() {
 	init(); /* initialisation de l'interpreteur */
     	
 	while(1) {
-		#ifdef DEBUG
+#ifdef DEBUG
 		printf("memshell-main: debut de la boucle de l'interpreteur\n");
-		#endif
+#endif
       		
 		printf(PROMPT);
 		
 		cmd = read_command(&args);
 		switch(cmd) {
 			
-			case INIT:
+		case INIT:
 				
-				printf("Réinitialisation de la mémoire (%d octets)...", HEAP_SIZE);
-				mem_init();
-				printf("OK\n");			
-				break;
+			printf("Réinitialisation de la mémoire (%d octets)...", HEAP_SIZE);
+			mem_init();
+			printf("OK\n");			
+			break;
 			
-			case SHOW:
-			
-				printf("Mémoire initialement disponible : %d octets\n", HEAP_SIZE);
-				mem_show(&mem_print);
-				break;
+		case SHOW:			
+			printf("Mémoire initialement disponible : %d octets débutant en %p\n", HEAP_SIZE, zone_memoire);
+			break;
 
-			case USED:
-				used();
-				break;
+		case USED:
+			used();
+			break;
 			
-			case ALLOC:
+		case ALLOC:
 
-				res = mem_alloc(args.size);
-				/* si une erreur a lieu, on affiche 0 */
-				if (res == NULL) {
-					printf("Erreur : échec de l'allocation (fonction mem_alloc, retour=NULL)\n");
-				} else {
-					id = get_id(res, args.size);
-					if (id == 0) {
-						/* s'il ne reste pas d'id libre
-						   on affiche 0 et on libere le bloc */
-						printf("Erreur : nombre maximum d'allocations atteint/n");
-						mem_free(res, args.size);
-					} else { /* pas de probleme, affichage de la zone allouée */
-						printf("%ld 0x%lX\n", id, (unsigned long)(res - (void*)zone_memoire));
-					}
+			res = mem_alloc(args.size);
+			/* si une erreur a lieu, on affiche 0 */
+			if (res == NULL) {
+				printf("Erreur : échec de l'allocation (fonction mem_alloc, retour=NULL)\n");
+			} else {
+				id = get_id(res, args.size);
+				if (id == 0) {
+					/* s'il ne reste pas d'id libre
+					   on affiche 0 et on libere le bloc */
+					printf("Erreur : nombre maximum d'allocations atteint/n");
+					mem_free(res, args.size);
+				} else { /* pas de probleme, affichage de la zone allouée */
+					printf("%ld 0x%lX\n", id, (unsigned long)(res - (void*)zone_memoire));
 				}
-				break;
-				
-			case FREE:
-						
-				if (get_info_from_id(args.id, &addr, &size) == -1)
-					/* erreur dans la valeur de l'id */
-					printf("Erreur : identificateur de bloc incorrect\n"); 
-				else {
-							
-							
-					/* liberation du bloc concerne */
-					mem_free(addr, size);
-									
-					/* liberation de l'id */
-					remove_id(args.id);
-								
-					/* NB : dans le cas normal, on n'affiche rien */
-				}
-				break;
-				
-				
-			case HELP:
-				help();
-				break;
-				
-			case EXIT:
-				mem_destroy();
-				goto end;	
-			
-			case ERROR:
-			
-				printf("Commande incorrecte\n");
-				break;
 			}
+			break;
+				
+
+		case DESTROY: 
+			mem_destroy();
+			break;
+
+		case FREE:
+						
+			if (get_info_from_id(args.id, &addr, &size) == -1)
+				/* erreur dans la valeur de l'id */
+				printf("Erreur : identificateur de bloc incorrect\n"); 
+			else {
+							
+							
+				/* liberation du bloc concerne */
+				mem_free(addr, size);
+									
+				/* liberation de l'id */
+				remove_id(args.id);
+								
+				/* NB : dans le cas normal, on n'affiche rien */
+			}
+			break;
+				
+				
+		case HELP:
+			help();
+			break;
+				
+		case EXIT:
+			mem_destroy();
+			goto end;	
 			
-    }
-    end: return 0;
-  }
+		case ERROR:
+			
+			printf("Commande incorrecte\n");
+			break;
+		}
+			
+	}
+end: return 0;
+}
