@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 2.4)
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
 project(Allocphy)
 enable_testing()
-add_definitions(-Wall -Werror)
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Werror")
 
 #########
 # Gestion des variantes
@@ -45,13 +50,17 @@ else(EXISTS /usr/src/gtest)
 endif(EXISTS /usr/src/gtest)
 
 ##
-# Si vous utilisé plusieurs fichiers, en plus de mem.c, il faut les
-# ajouter ici
+# Si vous utilisé plusieurs fichiers, en plus de mem.c, pour votre
+# allocatuer il faut les ajouter ici
 ##
-add_library(liballocphy STATIC src/mem.c)
+add_library(allocphy SHARED src/mem.c)
 
-
+##
+# Construction du programme de tests unitaires
+##
 add_executable(alloctest src/alloctest.cc tests/test_bf.cc tests/test_cff.cc  tests/test_buddy.cc tests/test_generic.cc tests/test_run_cpp.cc)
-target_link_libraries(alloctest gtest gtest_main liballocphy)
+target_link_libraries(alloctest gtest gtest_main allocphy)
 add_test(AllTestsAllocator alloctest)
 
+add_executable(memshell src/memshell.c)
+target_link_libraries(memshell allocphy)
