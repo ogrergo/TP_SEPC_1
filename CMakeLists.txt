@@ -64,3 +64,18 @@ add_test(AllTestsAllocator alloctest)
 
 add_executable(memshell src/memshell.c)
 target_link_libraries(memshell allocphy)
+
+##
+# Construction de l'archive
+##
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+set(CPACK_PACKAGE_VERSION_PATCH ${VARIANTE_LOGINS})
+set(CPACK_SOURCE_GENERATOR "TGZ")
+set(CPACK_SOURCE_IGNORE_FILES
+  "~$"
+  "\\\\.o$"
+  "^${PROJECT_SOURCE_DIR}/build/"
+  "^${PROJECT_SOURCE_DIR}/.git/"
+)
+include(CPack)
