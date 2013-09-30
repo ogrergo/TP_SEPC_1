@@ -6,7 +6,7 @@ endif(COMMAND cmake_policy)
 project(Allocphy)
 enable_testing()
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Werror")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Werror -std=gnu99")
 
 #########
 # Gestion des variantes
@@ -23,6 +23,7 @@ if (${VARIANTE_SHA} MATCHES "740444f437149a43d9f494c09ceec14f974517a6886da494619
   message(FATAL_ERROR "** ERREUR **: Vous devez modifier CMakeLists.txt pour y mettre vos logins")
 endif()
 execute_process(COMMAND echo ${VARIANTE_SHA} COMMAND tr "a-f" "A-F" COMMAND xargs printf "10 o 16 i %s 3 %% p" COMMAND dc OUTPUT_VARIABLE VARIANTE_SUJET)
+execute_process(COMMAND printf "${VARIANTE_LOGINS}" COMMAND sed "s/;/-/g" OUTPUT_VARIABLE VARIANTE_LOGINS)
 message("Votre variante sera la variante numéro " ${VARIANTE_SUJET})
 configure_file (
   src/variante.h.in
