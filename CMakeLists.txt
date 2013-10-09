@@ -23,7 +23,6 @@ if (${VARIANTE_SHA} MATCHES "740444f437149a43d9f494c09ceec14f974517a6886da494619
   message(FATAL_ERROR "** ERREUR **: Vous devez modifier CMakeLists.txt pour y mettre vos logins")
 endif()
 execute_process(COMMAND echo ${VARIANTE_SHA} COMMAND tr "a-f" "A-F" COMMAND xargs printf "10 o 16 i %s 3 %% p" COMMAND dc OUTPUT_VARIABLE VARIANTE_SUJET)
-execute_process(COMMAND printf "${VARIANTE_LOGINS}" COMMAND sed "s/;/-/g" OUTPUT_VARIABLE VARIANTE_LOGINS)
 message("Votre variante sera la variante numéro " ${VARIANTE_SUJET})
 configure_file (
   src/variante.h.in
@@ -79,7 +78,7 @@ target_link_libraries(memshell allocphy)
 ##
 # Construction de l'archive
 ##
-string(REPLACE ";" "-" LOGINS_SANS_POINTVIRGULE ${VARIANTE_LOGINS})
+string(REPLACE ";" "_" LOGINS_SANS_POINTVIRGULE ${VARIANTE_LOGINS})
 set(CPACK_PACKAGE_VERSION_MAJOR "1")
 set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH ${LOGINS_SANS_POINTVIRGULE})
