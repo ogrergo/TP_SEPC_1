@@ -72,6 +72,11 @@ add_executable(alloctest src/alloctest.cc tests/test_bf.cc tests/test_cff.cc  te
 target_link_libraries(alloctest gtest gtest_main allocphy)
 add_test(AllTestsAllocator alloctest)
 
+##
+# Ajout d'une cible pour lancer les tests de manière verbeuse
+##
+add_custom_target(check alloctest)
+
 add_executable(memshell src/memshell.c)
 target_link_libraries(memshell allocphy)
 
