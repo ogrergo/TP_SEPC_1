@@ -12,18 +12,20 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Werror -std=gnu99")
 # Gestion des variantes
 #########
 # Vous devez editer la ligne suivante pour y mettre vos logins
+# et le numéro de la variante que vous avez choisi
 #########
 set(VARIANTE_LOGINS login1 login2 login3)
-
+set(VARIANTE_SUJET -1)
 ###
 
 list(SORT VARIANTE_LOGINS)
-execute_process(COMMAND printf "${VARIANTE_LOGINS}" COMMAND sha512sum COMMAND cut -f 1 -d " " OUTPUT_VARIABLE VARIANTE_SHA)
-if (${VARIANTE_SHA} MATCHES "740444f437149a43d9f494c09ceec14f974517a6886da494619e4ed1c6530518b36f4b36615346ee845743ab072be382b3d4308b8a864b3bdd17406c69fc9a43")
+if (VARIANTE_LOGINS MATCHES "login[123]")
   message(FATAL_ERROR "** ERREUR **: Vous devez modifier CMakeLists.txt pour y mettre vos logins")
 endif()
-execute_process(COMMAND echo ${VARIANTE_SHA} COMMAND tr "a-f" "A-F" COMMAND xargs printf "10 o 16 i %s 3 %% p" COMMAND dc OUTPUT_VARIABLE VARIANTE_SUJET)
-message("Votre variante sera la variante numéro " ${VARIANTE_SUJET})
+if (VARIANTE_SUJET EQUAL -1)
+  message(FATAL_ERROR "** ERREUR **: Vous devez modifier CMakeLists.txt pour y mettre le numéro de votre variante du sujet")
+endif()
+
 configure_file (
   src/variante.h.in
   ${CMAKE_SOURCE_DIR}/src/variante.h
@@ -37,10 +39,9 @@ configure_file (
 # Compilation standard avec googletest
 #######
 
-
 ###
 # sur Debian et al, les googletests sont à recompiler
-# sur centOS6, c'est une bibliothèque avec sont équivalent de pkg-config
+# sur centOS6, c'est une bibliothèque avec son équivalent de pkg-config
 # sinon, on utilise l'autodetection de Cmake
 ###
 if(EXISTS /usr/src/gtest)
@@ -61,7 +62,7 @@ endif(EXISTS /usr/src/gtest)
 
 ##
 # Si vous utilisé plusieurs fichiers, en plus de mem.c, pour votre
-# allocatuer il faut les ajouter ici
+# allocateur il faut les ajouter ici
 ##
 add_library(allocphy SHARED src/mem.c)
 
