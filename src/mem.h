@@ -44,6 +44,9 @@ int mem_init();
 void *mem_alloc(unsigned long size);
 int mem_free(void *ptr, unsigned long size);
 int mem_destroy();
+void affiche_bloc();
+int split(int index);
+int find_bloc_by_index(int index);
 
 #ifdef __cplusplus
 }

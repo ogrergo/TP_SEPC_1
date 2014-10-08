@@ -30,7 +30,7 @@
  * Nombre de commandes differentes pour l'interpreteur
  * (sans inclure les commandes erronees (ERROR))
  */
-#define NB_CMD 8
+#define NB_CMD 9 
  
 /*
  * Nombre de caracteres maximal pour une ligne de commande
@@ -52,7 +52,7 @@
  * Identification de la commande tapee
  * On rajoute ERROR pour les commandes erronees
  */
-typedef enum {INIT=0, SHOW, USED, ALLOC, FREE, DESTROY, HELP, EXIT, ERROR} COMMAND;
+typedef enum {INIT=0, SHOW, USED, ALLOC, FREE, DESTROY, HELP, EXIT, BLOC ,ERROR} COMMAND;
 
 /*
  * type des identificateurs de blocs
@@ -97,7 +97,7 @@ unsigned long id_count;
 /*
  * Liste des commandes reconnues
  */
-static char* commands[NB_CMD] = {"init", "show", "used","alloc", "free", "destroy", "help", "exit"};
+static char* commands[NB_CMD] = {"init", "show", "used","alloc", "free", "destroy", "help", "exit", "bloc"};
 	
 	
 /*
@@ -155,6 +155,7 @@ void help()
 	printf("\tsous la forme {identificateur, adresse de départ, taille}\n");		
 	printf("6) help : affichage de ce manuel\n");
 	printf("7) exit : quitter le shell\n");
+	printf("7) bloc : afficher l'utilisation des blocs de la memoire\n");
 	
 	printf("\nRemarques :\n");
 	printf("1) Au lancement, le shell appelle mem_init\n");
@@ -462,7 +463,12 @@ int main() {
 				
 		case EXIT:
 			mem_destroy();
-			goto end;	
+			goto end;
+			break;
+
+		case BLOC:
+			affiche_bloc();
+			break;
 			
 		case ERROR:
 			
