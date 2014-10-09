@@ -6,7 +6,7 @@
 
 #include <sys/time.h>
 #include <sys/resource.h>
-
+#include <stdio.h>
 #include <gtest/gtest.h>
 
 #include "../src/mem.h"
@@ -111,13 +111,12 @@ TEST_F(BaseMemTest, bouclefreepairimpair) {
     }
   for(int i=0; i < nb; i+=2)
     {
-      ASSERT_EQ( mem_free( tab[i], 64 ), 0 );
+      	ASSERT_EQ( mem_free( tab[i], 64 ), 0 );
     }
   for(int i=1; i < nb; i+=2)
     {
       ASSERT_EQ( mem_free( tab[i], 64 ), 0 );
     }
-
   void *m1 = mem_alloc(ALLOC_MEM_SIZE);
   ASSERT_NE( m1, (void *)0 );
   memset(m1, 4, ALLOC_MEM_SIZE);
@@ -159,7 +158,6 @@ TEST_F(BaseMemTest, petitetaille) {
   ASSERT_EQ( mem_free( m1, 1 ), 0 );
   ASSERT_EQ( mem_free( m2, 1 ), 0 );
   
-
   void * m3 = mem_alloc(ALLOC_MEM_SIZE);
   ASSERT_NE( m3, (void *)0 ); 
   memset(m3, 4, ALLOC_MEM_SIZE);

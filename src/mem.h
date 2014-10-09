@@ -46,6 +46,7 @@ int mem_free(void *ptr, unsigned long size);
 int mem_destroy();
 void affiche_bloc();
 int split(int index);
+unsigned long get_max_bloc_size();
 int find_bloc_by_index(int index);
 
 #ifdef __cplusplus

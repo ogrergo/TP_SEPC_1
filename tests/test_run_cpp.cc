@@ -38,7 +38,7 @@ void doAlloc ::operator() (allocat &t)
   if ( t.adr == (char *)0 )
     {
       /* l'allocation a echoue */
-      printf ("Une allocation de %d a echoue !\n", t.size );
+      printf ("Une allocation a echoue ! taille a aloué|taille max des blocs dispo : |%9d|%9lu| \n", t.size ,get_max_bloc_size());
       
       t.adr = 0;
     }
